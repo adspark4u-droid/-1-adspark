@@ -24,6 +24,28 @@ const PLANS = {
   agency:  { name:"Agency",  color:C.gold,     badge:"AGENCY", canEdit:true,  canExport:true,  saveLimit:999 },
 };
 
+// ── Industry presets ───────────────────────────────────────────
+const INDUSTRIES = [
+  "","🍕 Food & Restaurant","🛍 Retail & E-commerce","💪 Health & Fitness",
+  "💆 Beauty & Wellness","🏠 Real Estate","💻 Tech & SaaS",
+  "📱 Mobile Apps","🎓 Education","💰 Finance & Banking",
+  "🏥 Healthcare","🚗 Automotive","✈️ Travel & Tourism",
+  "👗 Fashion","🎵 Music & Entertainment","🐾 Pet Services",
+  "🏗 Construction","⚖️ Legal Services","🍺 Bar & Nightlife",
+  "📸 Photography","🌿 Eco & Sustainability","Other",
+];
+
+// ── Share helper ───────────────────────────────────────────────
+function shareApp() {
+  const url = window.location.href.split("?")[0];
+  const text = "Check out AdSpark — AI ad generator that creates 3 scored concepts for any business in seconds!";
+  if (navigator.share) {
+    navigator.share({ title:"AdSpark — AI Ad Generator", text, url }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(url);
+  }
+}
+
 // ── In-memory saved store ──────────────────────────────────────
 let _savedStore = [];
 const savedListeners = new Set();
@@ -379,6 +401,7 @@ function IdeaCard({ idea: initialIdea, index, brandVoice, brandInfo, onSave, pla
           <div style={{ display:"flex", gap:8, flexShrink:0, marginLeft:12 }}>
             <button onClick={handleSave} style={{ background:savedFlag?"#0d1f0d":C.faint, border:`1px solid ${savedFlag?"#2a5a2a":C.border}`, borderRadius:6, color:savedFlag?C.lime:C.muted, padding:"6px 11px", fontSize:12, cursor:"pointer", transition:"all .2s", fontFamily:"inherit" }}>{savedFlag?"✓ Saved":"🔖 Save"}</button>
             <button onClick={handleCopy} style={{ background:copied?"#0d1f0d":C.faint, border:`1px solid ${copied?"#2a5a2a":C.border}`, borderRadius:6, color:copied?C.lime:C.muted, padding:"6px 11px", fontSize:12, cursor:"pointer", transition:"all .2s", fontFamily:"inherit" }}>{copied?"✓ Copied":"Copy"}</button>
+            <button onClick={shareApp} title="Share AdSpark" style={{ background:C.faint, border:`1px solid ${C.border}`, borderRadius:6, color:C.muted, padding:"6px 11px", fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>🔗</button>
             {canExport && <button onClick={() => exportToPDF([idea], brandInfo)} style={{ background:C.faint, border:`1px solid ${C.border}`, borderRadius:6, color:C.muted, padding:"6px 11px", fontSize:12, cursor:"pointer", fontFamily:"inherit" }}>⬇ PDF</button>}
           </div>
         </div>
@@ -617,7 +640,10 @@ Make each dramatically different. No markdown. Raw JSON only.`;
                 onMouseLeave={e => e.target.style.color=C.muted}>{label}</button>
             ))}
           </div>
-          <button onClick={() => setSection("app")} style={{ background:`linear-gradient(135deg,${C.electric},${C.pink})`, border:"none", borderRadius:8, color:"#fff", padding:"9px 20px", fontSize:13, fontWeight:700, cursor:"pointer" }}>Try for free →</button>
+          <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+            <button onClick={shareApp} style={{ background:C.faint, border:`1px solid ${C.border}`, borderRadius:8, color:C.muted, padding:"9px 14px", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:6 }}>🔗 Share</button>
+            <button onClick={() => setSection("app")} style={{ background:`linear-gradient(135deg,${C.electric},${C.pink})`, border:"none", borderRadius:8, color:"#fff", padding:"9px 20px", fontSize:13, fontWeight:700, cursor:"pointer" }}>Try for free →</button>
+          </div>
         </div>
       </nav>
 
@@ -752,7 +778,10 @@ Make each dramatically different. No markdown. Raw JSON only.`;
             <button key={label} onClick={() => setSection(target)} style={{ background:"transparent", border:"none", color:section===target?C.text:C.muted, fontSize:14, fontWeight:section===target?700:500, cursor:"pointer", fontFamily:"inherit", padding:0, borderBottom:section===target?`2px solid ${C.electric}`:"2px solid transparent", paddingBottom:2 }}>{label}</button>
           ))}
         </div>
-        <button onClick={() => setSection("app")} style={{ background:`linear-gradient(135deg,${C.electric},${C.pink})`, border:"none", borderRadius:8, color:"#fff", padding:"9px 20px", fontSize:13, fontWeight:700, cursor:"pointer" }}>Try for free →</button>
+        <div style={{ display:"flex", gap:10, alignItems:"center" }}>
+          <button onClick={shareApp} style={{ background:C.faint, border:`1px solid ${C.border}`, borderRadius:8, color:C.muted, padding:"9px 14px", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"inherit", display:"flex", alignItems:"center", gap:6 }}>🔗 Share</button>
+          <button onClick={() => setSection("app")} style={{ background:`linear-gradient(135deg,${C.electric},${C.pink})`, border:"none", borderRadius:8, color:"#fff", padding:"9px 20px", fontSize:13, fontWeight:700, cursor:"pointer" }}>Try for free →</button>
+        </div>
       </div>
     </nav>
   );
@@ -998,7 +1027,9 @@ Make each dramatically different. No markdown. Raw JSON only.`;
             </div>
             <div>
               <label style={labelSx}>Industry</label>
-              <input value={industry} onChange={e => setIndustry(e.target.value)} placeholder="e.g. Fitness, SaaS" style={inputSx(false)}/>
+              <select value={industry} onChange={e => setIndustry(e.target.value)} style={{ ...inputSx(false), cursor:"pointer" }}>
+                {INDUSTRIES.map(i => <option key={i} value={i}>{i || "Select an industry..."}</option>)}
+              </select>
             </div>
           </div>
 
